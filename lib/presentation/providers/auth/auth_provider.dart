@@ -5,13 +5,7 @@ import 'package:bluesurvey_app/infrastructure/services/key_value_storage.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum AuthStatus {
-  checking,
-  authenticated,
-  notAuthenticated,
-  registred,
-  invited
-}
+enum AuthStatus { checking, authenticated, notAuthenticated, newUser, invited }
 
 class AuthState {
   final AuthStatus authStatus;
@@ -59,13 +53,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> signUpUser(
-      String username, String email, String password) async {
+  Future<void> signUpUser(String name, String email, String password) async {
     try {
-      final newUser = await authUser.signup(username, email, password);
+      final newUser = await authUser.signup(name, email, password);
       state = state.copyWith(
         errorMessage: newUser,
-        authStatus: AuthStatus.registred,
+        authStatus: AuthStatus.newUser,
       );
     } on CustomError catch (error) {
       logout(error.message);

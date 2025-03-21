@@ -1,5 +1,6 @@
 import 'package:bluesurvey_app/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -90,12 +91,23 @@ class FormLoginView extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15))),
               child: Text(
-                "Entrar",
+                "Iniciar sesión",
                 style: TextStyle(
                     color: colors.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16),
               ),
+            )),
+        SizedBox(
+          height: 10,
+        ),
+        TextButton(
+            onPressed: () {
+              context.push('/signup');
+            },
+            child: Text(
+              "No tengo cuenta",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ))
       ],
     );

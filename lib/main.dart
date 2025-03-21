@@ -4,7 +4,6 @@ import 'package:bluesurvey_app/config/themes/light_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 void main() async {
   await Environment.initEnvirontment();
   runApp(const ProviderScope(child: MyApp()));
@@ -21,7 +20,6 @@ class MyApp extends ConsumerWidget {
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
-
     );
   }
 }

@@ -14,6 +14,7 @@ class CustomTextField extends StatelessWidget {
   final bool enabled;
   final TextInputType keyboardType;
   final int maxLines;
+  final bool isParagraph;
 
   const CustomTextField(
       {super.key,
@@ -29,7 +30,8 @@ class CustomTextField extends StatelessWidget {
       this.readOnly = false,
       this.enabled = true,
       this.keyboardType = TextInputType.text,
-      this.maxLines = 1});
+      this.maxLines = 1,
+      this.isParagraph = false});
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +61,7 @@ class CustomTextField extends StatelessWidget {
         keyboardType: keyboardType,
         onTap: onTap,
         readOnly: readOnly,
-        maxLines: maxLines,
+        maxLines: isParagraph ? null : maxLines,
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
         cursorColor: colors.primary,
         decoration: InputDecoration(

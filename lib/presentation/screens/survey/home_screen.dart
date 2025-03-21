@@ -1,3 +1,4 @@
+import 'package:bluesurvey_app/presentation/widgets/create_survey_modal.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -6,11 +7,30 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-
     return Scaffold(
       backgroundColor: colors.surface,
       body: HomeView(),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            createSurveyModal(context);
+          },
+          backgroundColor: colors.primary,
+          child: Icon(
+            Icons.add,
+            color: colors.onPrimary,
+          )),
     );
+  }
+
+  createSurveyModal(context) {
+    showModalBottomSheet(context: context, builder: (context) {
+      return CreateSurveyModal();
+    });
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return CreateSurveyModal();
+    //     });
   }
 }
 
@@ -56,7 +76,7 @@ class SurveysView extends StatelessWidget {
     return Expanded(
       child: ListView.builder(
           padding: EdgeInsets.all(0),
-          itemCount: 100,
+          itemCount: 5,
           itemBuilder: (context, index) {
             return Container(
               margin: EdgeInsets.only(bottom: 10),
@@ -152,7 +172,7 @@ class HeaderView extends StatelessWidget {
                 width: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colors.primary,
+                  color: colors.secondary,
                 ),
                 child: IconButton(
                   onPressed: () {},

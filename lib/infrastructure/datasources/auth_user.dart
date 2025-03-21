@@ -36,10 +36,10 @@ class AuthUser {
     }
   }
 
-  Future<String> signup(String username, String email, String password) async {
+  Future<String> signup(String name, String email, String password) async {
     try {
       final response = await dio.post('/signup', data: {
-        'username': username,
+        'name': name,
         'email': email,
         'password': password,
       });
@@ -48,7 +48,8 @@ class AuthUser {
       return userCreated;
     } on DioException catch (error) {
       if (error.response?.statusCode == 400) {
-        throw CustomError(error.response?.data['error'] ?? 'Usuario existente');
+        throw CustomError(
+            error.response?.data['error'] ?? 'Error al crear el usuario');
       }
 
       if (error.type == DioExceptionType.connectionError) {
@@ -65,14 +66,12 @@ class AuthUser {
     try {
       final response = await dio.get('/user',
           options: Options(headers: {'Authorization': 'Bearer $token'}));
-
       final user = UserMapper.userJsonToEntity(response.data);
       return user;
     } on DioException catch (error) {
       if (error.response?.statusCode == 401) {
         throw CustomError(error.response?.data['message'] ?? 'No valido');
       }
-
       throw Exception();
     } catch (error) {
       throw Exception();

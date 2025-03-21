@@ -1,8 +1,10 @@
 import 'package:bluesurvey_app/config/router/app_router_notifier.dart';
+import 'package:bluesurvey_app/presentation/providers/auth/auth_provider.dart';
 import 'package:bluesurvey_app/presentation/screens/auth/check_auth_screen.dart';
 import 'package:bluesurvey_app/presentation/screens/auth/login_screen.dart';
 import 'package:bluesurvey_app/presentation/screens/auth/signup_screen.dart';
 import 'package:bluesurvey_app/presentation/screens/survey/home_screen.dart';
+import 'package:bluesurvey_app/presentation/screens/survey/survey_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,7 +12,7 @@ final goRouterProvider = Provider((ref) {
   final goRouterNotifier = ref.read(goRouterNotifierProvider);
 
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/splash',
     refreshListenable: goRouterNotifier,
     routes: [
       GoRoute(
@@ -28,11 +30,15 @@ final goRouterProvider = Provider((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/survey',
+        builder: (context, state) => const SurveyScreen(),
       )
     ],
     redirect: (context, state) {
-      // final isGoinTo = state.matchedLocation;
-      // final authStatus = goRouterNotifier.authStatus;
+      final isGoinTo = state.matchedLocation;
+      final authStatus = goRouterNotifier.authStatus;
 
       // if (isGoinTo.startsWith('/form/')) {
       //   if (authStatus == AuthStatus.checking ||
@@ -52,29 +58,28 @@ final goRouterProvider = Provider((ref) {
       //   return null;
       // }
 
-      // if (isGoinTo == '/splash' && authStatus == AuthStatus.checking) {
-      //   if (isGoinTo.startsWith('/form/')) {
-      //     return isGoinTo;
-      //   }
-      //   return null;
-      // }
+      if (isGoinTo == '/splash' && authStatus == AuthStatus.checking) {
+        // if (isGoinTo.startsWith('/form/')) {
+        //   return isGoinTo;
+        // }
+        return null;
+      }
 
-      // if (authStatus == AuthStatus.notAuthenticated) {
-      //   if (isGoinTo == '/signin' || isGoinTo == '/signup') return null;
 
-      //   return '/home';
-      // }
+      if (authStatus == AuthStatus.notAuthenticated) {
+        if (isGoinTo == '/login' || isGoinTo == '/signup') return null;
+        return '/login';
+      }
 
-      // if (authStatus == AuthStatus.authenticated) {
-      //   if (isGoinTo == '/signin' ||
-      //       isGoinTo == '/signup' ||
-      //       isGoinTo == '/splash' ||
-      //       isGoinTo == '/home') {
-      //     return '/dashboard';
-      //   }
-      // }
+      if (authStatus == AuthStatus.authenticated) {
+        if (isGoinTo == '/login' ||
+            isGoinTo == '/signup' ||
+            isGoinTo == '/splash') {
+          return '/home';
+        }
+      }
 
-      // return null;
+      return null;
     },
   );
 });
