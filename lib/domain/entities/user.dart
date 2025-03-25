@@ -3,15 +3,15 @@ import 'package:bluesurvey_app/domain/entities/role.dart';
 class User {
   final String id;
   final String email;
-  final String username;
-  final List<Role> roles;
-  final String token;
+  final String name;
+  final String accessToken;
+  final String refreshToken;
 
   User({
     required this.id,
     required this.email,
-    required this.username,
-    required this.roles,
-    required this.token,
+    required this.name,
+    required this.accessToken,
+    required this.refreshToken
   });
 }
