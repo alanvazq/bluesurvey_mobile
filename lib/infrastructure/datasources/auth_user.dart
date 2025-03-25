@@ -62,7 +62,7 @@ class AuthUser {
     }
   }
 
-  Future<User> checkAuthStatus(String token) async {
+  Future checkAuthStatus(String token) async {
     try {
       final response = await dio.get('/user',
           options: Options(headers: {'Authorization': 'Bearer $token'}));
@@ -90,6 +90,23 @@ class AuthUser {
         return CustomError(
             error.response?.data['message'] ?? 'Usuarios no encontrados');
       }
+    } catch (error) {
+      throw Exception();
+    }
+  }
+
+  Future requestNewAccesToken(String refreshToken) async {
+    try {
+      final response = await dio.get('/refresh-token',
+          options: Options(headers: {'Authorization': 'Bearer $refreshToken'}));
+
+      final accessToken = response.data['accessToken'];
+      return accessToken;
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 401) {
+        throw CustomError(error.response?.data['message'] ?? 'No valido');
+      }
+      throw Exception();
     } catch (error) {
       throw Exception();
     }

@@ -2,7 +2,6 @@ import 'package:bluesurvey_app/domain/entities/user.dart';
 import 'package:bluesurvey_app/infrastructure/datasources/auth_user.dart';
 import 'package:bluesurvey_app/infrastructure/errors/custom_error.dart';
 import 'package:bluesurvey_app/infrastructure/services/key_value_storage.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthStatus { checking, authenticated, notAuthenticated, newUser, invited }
@@ -49,6 +48,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } on CustomError catch (error) {
       logout(error.message);
     } catch (error) {
+      print(error);
       logout('Ocurrió un error');
     }
   }
@@ -69,7 +69,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future getUsers() async {
     try {
-      final users = await authUser.getAllUsers(state.user!.token);
+      final users = await authUser.getAllUsers(state.user!.accessToken);
       state = state.copyWith(
         users: users,
       );
@@ -81,19 +81,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void checkAuthStatus() async {
-    final token = await keyValueStorage.getValue<String>('token');
-    if (token == null) return logout();
+    final token = await keyValueStorage.getValue<String>('accessToken');
+    if (token == null) {
+      final refreshToken = await keyValueStorage.getValue<String>("refreshToken");
+      if (refreshToken == null) return logout();
 
-    try {
-      final user = await authUser.checkAuthStatus(token);
-      _setLoggedUser(user);
-    } catch (error) {
-      logout();
+      final newAccessToken = await authUser.requestNewAccesToken(refreshToken);
+      if (newAccessToken) {
+        final user = await authUser.checkAuthStatus(newAccessToken);
+        _setLoggedUser(user);
+      }
+    } else {
+      try {
+        final user = await authUser.checkAuthStatus(token);
+        _setLoggedUser(user);
+      } catch (error) {
+        logout();
+      }
     }
   }
 
   void _setLoggedUser(User user) async {
-    await keyValueStorage.setKeyValue('token', user.token);
+    await keyValueStorage.setKeyValue('accessToken', user.accessToken);
+    await keyValueStorage.setKeyValue('refreshToken', user.refreshToken);
     state = state.copyWith(
       user: user,
       authStatus: AuthStatus.authenticated,

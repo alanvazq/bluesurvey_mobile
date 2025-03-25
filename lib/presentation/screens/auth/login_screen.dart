@@ -1,5 +1,8 @@
+import 'package:bluesurvey_app/presentation/providers/auth/auth_provider.dart';
+import 'package:bluesurvey_app/presentation/providers/auth/login_provider.dart';
 import 'package:bluesurvey_app/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -60,23 +63,30 @@ class LoginView extends StatelessWidget {
   }
 }
 
-class FormLoginView extends StatelessWidget {
+class FormLoginView extends ConsumerWidget {
   const FormLoginView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
-
+    final loginState = ref.watch(loginProvider);
     return Column(
       children: [
         CustomTextField(
           label: "Correo",
+          onChanged: ref.read(loginProvider.notifier).onEmailChanged,
+          errorMessage:
+              loginState.isFormPosted ? loginState.email.errorMessage : null,
         ),
         SizedBox(
           height: 10,
         ),
         CustomTextField(
           label: "Contraseña",
+          onChanged: ref.read(loginProvider.notifier).onPasswordChanged,
+          errorMessage:
+              loginState.isFormPosted ? loginState.password.errorMessage : null,
+              isObscureText: true,
         ),
         SizedBox(
           height: 10,
@@ -84,7 +94,9 @@ class FormLoginView extends StatelessWidget {
         SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ref.read(loginProvider.notifier).onFormSubmit();
+              },
               style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(16),
                   backgroundColor: colors.primary,
