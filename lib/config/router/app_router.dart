@@ -3,7 +3,7 @@ import 'package:bluesurvey_app/presentation/providers/auth/auth_provider.dart';
 import 'package:bluesurvey_app/presentation/screens/auth/check_auth_screen.dart';
 import 'package:bluesurvey_app/presentation/screens/auth/login_screen.dart';
 import 'package:bluesurvey_app/presentation/screens/auth/signup_screen.dart';
-import 'package:bluesurvey_app/presentation/screens/survey/home_screen.dart';
+import 'package:bluesurvey_app/presentation/screens/home/home_screen.dart';
 import 'package:bluesurvey_app/presentation/screens/survey/survey_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,12 +32,14 @@ final goRouterProvider = Provider((ref) {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
-        path: '/survey',
-        builder: (context, state) => const SurveyScreen(),
+        path: '/survey/:id',
+        builder: (context, state) => SurveyScreen(
+          surveyId: state.pathParameters['id'] ?? 'No ID',
+        ),
       )
     ],
     redirect: (context, state) {
-      final isGoinTo = state.matchedLocation;
+      final isGoingTo = state.matchedLocation;
       final authStatus = goRouterNotifier.authStatus;
 
       // if (isGoinTo.startsWith('/form/')) {
@@ -58,23 +60,22 @@ final goRouterProvider = Provider((ref) {
       //   return null;
       // }
 
-      if (isGoinTo == '/splash' && authStatus == AuthStatus.checking) {
+      if (isGoingTo == '/splash' && authStatus == AuthStatus.checking) {
         // if (isGoinTo.startsWith('/form/')) {
         //   return isGoinTo;
         // }
         return null;
       }
 
-
       if (authStatus == AuthStatus.notAuthenticated) {
-        if (isGoinTo == '/login' || isGoinTo == '/signup') return null;
+        if (isGoingTo == '/login' || isGoingTo == '/signup') return null;
         return '/login';
       }
 
       if (authStatus == AuthStatus.authenticated) {
-        if (isGoinTo == '/login' ||
-            isGoinTo == '/signup' ||
-            isGoinTo == '/splash') {
+        if (isGoingTo == '/login' ||
+            isGoingTo == '/signup' ||
+            isGoingTo == '/splash') {
           return '/home';
         }
       }

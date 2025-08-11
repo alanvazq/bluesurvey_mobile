@@ -9,6 +9,8 @@ ThemeData lightTheme = ThemeData(
         onSurface: Color(0xff303030),
         primary: Color(0xff537fe7),
         secondary: Color(0xFFffffff),
+        tertiary: Color(0xFFcacaca),
+        onTertiary: Color(0xff767676),
         primaryContainer: Color(0xffFFFFFF),
         onPrimary: Color(0xffffffff),
         onSecondary: Color(0xff537fe7),

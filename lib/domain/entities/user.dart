@@ -1,5 +1,3 @@
-import 'package:bluesurvey_app/domain/entities/role.dart';
-
 class User {
   final String id;
   final String email;

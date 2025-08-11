@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final int maxLines;
   final bool isParagraph;
+  final bool isTitleQuestion;
 
   const CustomTextField(
       {super.key,
@@ -31,7 +32,8 @@ class CustomTextField extends StatelessWidget {
       this.enabled = true,
       this.keyboardType = TextInputType.text,
       this.maxLines = 1,
-      this.isParagraph = false});
+      this.isParagraph = false,
+      this.isTitleQuestion = false});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,12 @@ class CustomTextField extends StatelessWidget {
         onTap: onTap,
         readOnly: readOnly,
         maxLines: isParagraph ? null : maxLines,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+        style: isTitleQuestion
+            ? TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                color: colors.primary)
+            : const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
         cursorColor: colors.primary,
         decoration: InputDecoration(
           alignLabelWithHint: true,

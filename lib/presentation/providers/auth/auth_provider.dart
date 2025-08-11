@@ -81,23 +81,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void checkAuthStatus() async {
-    final token = await keyValueStorage.getValue<String>('accessToken');
-    if (token == null) {
-      final refreshToken = await keyValueStorage.getValue<String>("refreshToken");
-      if (refreshToken == null) return logout();
-
-      final newAccessToken = await authUser.requestNewAccesToken(refreshToken);
-      if (newAccessToken) {
-        final user = await authUser.checkAuthStatus(newAccessToken);
-        _setLoggedUser(user);
+    final accessToken = await keyValueStorage.getValue<String>('accessToken');
+    if (accessToken != null) {
+      //Usuaro autenticado
+      try {
+        final user = await authUser.checkAuthStatus(accessToken);
+        if (user != null) {
+          return _setLoggedUser(user);
+        }
+      } catch (e) {
+        logout('Algo salió mal');
+      }
+    }
+    // Usuario no autenticado
+    final refreshToken = await keyValueStorage.getValue<String>("refreshToken");
+    if (refreshToken != null) {
+      try {
+        final newAccessToken =
+            await authUser.requestNewAccesToken(refreshToken);
+        if (newAccessToken != null) {
+          final user = await authUser.checkAuthStatus(newAccessToken);
+          if (user) {
+            return _setLoggedUser(user);
+          }
+        }
+      } catch (e) {
+        logout('Algo salió mal');
       }
     } else {
-      try {
-        final user = await authUser.checkAuthStatus(token);
-        _setLoggedUser(user);
-      } catch (error) {
-        logout();
-      }
+      logout('Algo salió mal');
     }
   }
 
@@ -112,13 +124,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout([String? errorMessage]) async {
-    await keyValueStorage.removeKey('token');
-
-    state = state.copyWith(
-      authStatus: AuthStatus.notAuthenticated,
-      user: null,
-      errorMessage: errorMessage,
-    );
+    try {
+      final refreshToken =
+          await keyValueStorage.getValue<String>("refreshToken");
+      if (refreshToken != null) {
+        final tokenRemoved = await authUser.signout(refreshToken);
+        if (tokenRemoved) {
+          await keyValueStorage.removeKey('accessToken');
+          await keyValueStorage.removeKey('refreshToken');
+          state = state.copyWith(
+            authStatus: AuthStatus.notAuthenticated,
+            user: null,
+            errorMessage: errorMessage,
+          );
+        }
+      } else {
+        state = state.copyWith(
+          authStatus: AuthStatus.notAuthenticated,
+          user: null,
+          errorMessage: errorMessage,
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        authStatus: AuthStatus.notAuthenticated,
+        user: null,
+        errorMessage: errorMessage,
+      );
+    }
   }
 }
 

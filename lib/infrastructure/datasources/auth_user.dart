@@ -62,6 +62,39 @@ class AuthUser {
     }
   }
 
+  Future signout(String refreshToken) async {
+    try {
+      final response = await dio.delete('/signout',
+          options: Options(headers: {'Authorization': 'Bearer $refreshToken'}));
+
+      final tokenDeleted = response.data['message'];
+      return tokenDeleted;
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 401) {
+        throw CustomError(
+            error.response?.data['error'] ?? 'Error al cerrar sesión');
+      }
+
+      if (error.response?.statusCode == 404) {
+        throw CustomError(
+            error.response?.data['error'] ?? 'Error al cerrar sesión');
+      }
+
+      if (error.response?.statusCode == 500) {
+        throw CustomError(
+            error.response?.data['error'] ?? 'Error al cerrar sesión');
+      }
+
+      if (error.type == DioExceptionType.connectionError) {
+        throw CustomError('Revisar conexión a internet');
+      }
+
+      throw Exception();
+    } catch (error) {
+      throw Exception();
+    }
+  }
+
   Future checkAuthStatus(String token) async {
     try {
       final response = await dio.get('/user',
@@ -97,7 +130,7 @@ class AuthUser {
 
   Future requestNewAccesToken(String refreshToken) async {
     try {
-      final response = await dio.get('/refresh-token',
+      final response = await dio.post('/refresh-token',
           options: Options(headers: {'Authorization': 'Bearer $refreshToken'}));
 
       final accessToken = response.data['accessToken'];

@@ -86,7 +86,7 @@ class FormLoginView extends ConsumerWidget {
           onChanged: ref.read(loginProvider.notifier).onPasswordChanged,
           errorMessage:
               loginState.isFormPosted ? loginState.password.errorMessage : null,
-              isObscureText: true,
+          isObscureText: true,
         ),
         SizedBox(
           height: 10,
@@ -94,9 +94,11 @@ class FormLoginView extends ConsumerWidget {
         SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                ref.read(loginProvider.notifier).onFormSubmit();
-              },
+              onPressed: loginState.isPosting
+                  ? null
+                  : () {
+                      ref.read(loginProvider.notifier).onFormSubmit();
+                    },
               style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(16),
                   backgroundColor: colors.primary,

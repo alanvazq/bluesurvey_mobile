@@ -51,7 +51,13 @@ class LoginNotifier extends StateNotifier<LoginState> {
   onFormSubmit() async {
     _touchEveryField();
     if (!state.isValid) return;
-    await login(state.email.value, state.password.value);
+    try {
+      state = state.copyWith(isPosting: true);
+      await login(state.email.value, state.password.value);
+    } catch (e) {
+      print(e);
+    }
+    state = state.copyWith(isPosting: false);
   }
 
   _touchEveryField() {
